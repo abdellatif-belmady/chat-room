@@ -8,9 +8,9 @@ import sqlite3
 import os
 
 app = Flask(__name__)
-CORS(app)
-app.config["SECRET_KEY"] = "hjhjsdahhds"
-socketio = SocketIO(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
+app.config["SECRET_KEY"] = "dtdrterttrtgfjkfghbkj"
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 rooms = {}
 
@@ -219,4 +219,4 @@ def disconnect():
     print(f"{name} has left the room {room}")
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True, host="0.0.0.0", port=5000, allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True, host="0.0.0.0", port=5000)

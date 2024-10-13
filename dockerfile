@@ -1,33 +1,20 @@
-# Use Python 3.10 as base image
-FROM python:3.10-slim
+# Use the official Python 3.10 image from the Docker Hub as the base image
+FROM python:3.10
 
-# Set working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Install Rust and Cargo and system dependencies required for Python packages
-RUN apt-get update && \
-    apt-get install -y curl build-essential && \
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy requirements first to leverage Docker cache
+# Copy the requirements file into the container at /app
 COPY requirements.txt .
 
-# Install Python dependencies
+# Install the dependencies specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the current directory contents into the container at /app
+COPY . .
 
-# Copy the rest of the application
-COPY app.py .
-
-COPY . /app/
-
-# Expose the port the app runs on
+# Expose port 5000 for the Flask app
 EXPOSE 5000
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-
-# Command to run the application directly with Python
-CMD ["python", "app.py"]
+# Command to run the Flask server
+CMD ["gunicorn", "-k", "eventlet", "-w", "1", "--bind", "0.0.0.0:5000", "app:app"]
